@@ -1,0 +1,378 @@
+/*
+ * Retro Arcade skin, loaded last.
+ *
+ *   palette     deep navy #160a29 · electric violet #e0158f · aqua #39ff14 · mist #fdf7ff
+ *   motion      cinematic reveals: clip-path wipes for headings, cards and photos
+ *   hover       3D tilt cards with a cursor-following glare
+ *   atmosphere  slow mesh-gradient arcade blobs behind the hero and section bands
+ *   type        gradient-filled display headings with a slow shimmer
+ *
+ * Visual only: no layout, sizes, content or order change. Colours are remapped at build time
+ * (scripts/variants/arcade.mjs); this file styles with the surface-aware variables that step
+ * maintains (--rx-fg, --rx-accent, --rx-line, --rx-glow, ...). Classes prefixed rx- are added
+ * by scripts/arcade.js.
+ */
+
+:root {
+  --rx-void: #0e0619;
+  --rx-navy: #160a29;
+  --rx-navy2: #1e0f38;
+  --rx-violet: #e0158f;
+  --rx-violet-hi: #ff6be6;
+  --rx-aqua: #39ff14;
+  --rx-mist: #fdf7ff;
+
+  --rx-accent: #39ff14;
+  --rx-accent2: #b6ff9e;
+  --rx-white: #fdf7ff;
+  --rx-fg: #fdf7ff;
+  --rx-fg2: #e2d6f0;
+  --rx-muted: #a993c4;
+  --rx-deep: #ffe600;
+  --rx-hot: #ff6be6;
+  --rx-line: rgba(253, 247, 255, .14);
+  --rx-line2: rgba(253, 247, 255, .3);
+  --rx-glow: #e0158f;
+
+  --rx-ease: cubic-bezier(.16, 1, .3, 1);       /* long, cinematic settle */
+  --rx-ease-io: cubic-bezier(.65, 0, .35, 1);
+  --rx-heading-grad: linear-gradient(100deg, #fdf7ff 0%, #ffe600 20%, #39ff14 46%, #ff6be6 72%, #fdf7ff 100%);
+}
+
+/* ---------- base ---------------------------------------------------------- */
+html { scrollbar-color: var(--rx-violet) var(--rx-void); color-scheme: dark; }
+body { background-color: var(--rx-navy); color: var(--rx-fg); }
+
+::selection { background: rgba(224, 21, 143, .55); color: #fff; }
+
+:focus-visible { outline: 2px solid var(--rx-aqua) !important; outline-offset: 3px; }
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--rx-void); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--rx-violet), var(--rx-aqua));
+  border: 3px solid var(--rx-void); border-radius: 12px;
+}
+
+hr { border-color: var(--rx-line) !important; }
+
+/* ---------- typography: gradient display headings -------------------------- */
+/* .rx-grad is set only on large headings whose own text is light, so accent words keep their colour */
+/* --rx-gw / --rx-gx / --rx-gt (set by arcade.js) lay one gradient across the whole heading;
+   the registered --rx-shift slides it so every word shimmers together */
+@property --rx-shift { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.rx-grad {
+  background-image: var(--rx-heading-grad) !important;
+  background-size: var(--rx-gw, 260%) 100% !important;
+  background-position: calc(var(--rx-gx, 0px) - var(--rx-shift)) 50% !important;
+  background-repeat: no-repeat !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;          /* accent words set their own colour and stay solid */
+  text-shadow: none !important;
+}
+.rx-grad.rx-live { animation: rx-shimmer 14s var(--rx-ease-io) infinite alternate; }
+@keyframes rx-shimmer { from { --rx-shift: 0px; } to { --rx-shift: var(--rx-gt, 0px); } }
+
+blockquote { border-left-color: var(--rx-violet) !important; }
+
+/* body-copy links: aqua underline that brightens */
+.rx-prose-link {
+  text-decoration-color: color-mix(in srgb, var(--rx-accent) 55%, transparent) !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 3px;
+  transition: color .25s var(--rx-ease), text-decoration-color .25s var(--rx-ease), text-shadow .25s;
+}
+.rx-prose-link:hover {
+  color: var(--rx-accent) !important;
+  text-decoration-color: var(--rx-accent) !important;
+  text-shadow: 0 0 14px rgba(57, 255, 20, .45);
+}
+
+/* ---------- buttons: glow lighting ---------------------------------------- */
+.rx-btn,
+#hwnav .hw-btn,
+.elementor-button,
+.hs-button,
+input[type="submit"],
+button[type="submit"] {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 10px 28px -12px var(--rx-glow) !important;
+  transition: box-shadow .35s var(--rx-ease), filter .35s var(--rx-ease), translate .35s var(--rx-ease), background-color .25s, color .25s !important;
+}
+.rx-btn:hover,
+#hwnav .hw-btn:hover,
+.elementor-button:hover,
+.hs-button:hover,
+input[type="submit"]:hover,
+button[type="submit"]:hover {
+  translate: 0 -2px;
+  filter: brightness(1.1) saturate(1.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 0 1px color-mix(in srgb, var(--rx-glow) 60%, transparent),
+    0 16px 38px -10px var(--rx-glow), 0 0 40px -6px color-mix(in srgb, var(--rx-glow) 55%, transparent) !important;
+}
+.rx-btn:active,
+.elementor-button:active,
+.hs-button:active,
+input[type="submit"]:active,
+button[type="submit"]:active { translate: 0 0; filter: brightness(.96); transition-duration: .08s !important; }
+/* arrow / icon inside a button glides on hover */
+.rx-btn svg, .rx-btn i, .elementor-button svg, .elementor-button i { transition: translate .35s var(--rx-ease); }
+.rx-btn:hover svg, .rx-btn:hover i, .elementor-button:hover svg, .elementor-button:hover i { translate: 3px 0; }
+
+/* pills / tags */
+.rx-pill { transition: box-shadow .3s var(--rx-ease), border-color .3s, color .3s, background-color .3s; }
+a.rx-pill:hover, button.rx-pill:hover {
+  box-shadow: 0 0 0 1px rgba(57, 255, 20, .55), 0 0 18px -4px rgba(57, 255, 20, .6) !important;
+}
+
+/* ---------- form fields ----------------------------------------------------- */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="hidden"]):not([type="file"]):not([type="image"]),
+textarea,
+select { transition: box-shadow .3s var(--rx-ease), border-color .3s; caret-color: var(--rx-aqua); }
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="hidden"]):not([type="file"]):not([type="image"]):focus,
+textarea:focus,
+select:focus {
+  outline: 0 !important;
+  border-color: var(--rx-aqua) !important;
+  box-shadow: 0 0 0 3px rgba(57, 255, 20, .18), 0 0 24px -6px rgba(57, 255, 20, .5) !important;
+}
+input::placeholder, textarea::placeholder { color: rgba(253, 247, 255, .45); }
+
+/* ---------- cards: depth + 3D tilt ------------------------------------------ */
+.rx-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 18px 40px -28px rgba(0, 0, 0, .9);
+  transition: box-shadow .5s var(--rx-ease), border-color .4s, transform .7s var(--rx-ease);
+}
+.rx-card.rx-hot:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 0 1px rgba(224, 21, 143, .45),
+    0 30px 60px -24px rgba(224, 21, 143, .55), 0 0 60px -20px rgba(57, 255, 20, .35) !important;
+}
+/* while tilting, the card follows the pointer quickly and a glare tracks it */
+.rx-card.rx-tilting { transition: box-shadow .5s var(--rx-ease), border-color .4s, transform .12s linear; will-change: transform; }
+.rx-card.rx-glare.rx-tilting {
+  background-image: radial-gradient(560px circle at var(--rx-mx, 50%) var(--rx-my, 50%), rgba(255, 107, 230, .2), rgba(57, 255, 20, .06) 35%, transparent 60%) !important;
+}
+
+/* photos: soft lift on hover */
+.rx-img { transition: filter .6s var(--rx-ease); }
+a:hover .rx-img, .rx-img:hover { filter: saturate(1.12) brightness(1.05); }
+
+/* post-loop cards: titles follow the card surface */
+.e-loop-item .elementor-heading-title { color: var(--rx-fg); }
+
+/* sections drawn over light photography keep navy ink (set by arcade.js after sampling the image) */
+.rx-lightzone {
+  --rx-fg: #160a29 !important; --rx-fg2: #1e1030 !important; --rx-white: #160a29 !important; --rx-muted: #4a3a62 !important;
+  --rx-accent: #c0127a !important; --rx-accent2: #a0106a !important; --rx-deep: #5a0d4a !important; --rx-hot: #c0127a !important;
+  --rx-line: rgba(22, 10, 41, .18) !important; --rx-line2: rgba(22, 10, 41, .35) !important; --rx-glow: #e0158f !important;
+}
+
+/* dark logos / line-art on transparent backgrounds are lifted onto the night sky */
+.rx-inv { filter: invert(1) hue-rotate(180deg) brightness(1.05) !important; }
+.rx-inv-force { filter: brightness(0) invert(.94) !important; }
+
+/* ---------- site chrome ------------------------------------------------------- */
+#hwnav .hw-bar { box-shadow: 0 1px 0 rgba(224, 21, 143, .28), 0 12px 40px -24px rgba(224, 21, 143, .6) !important; }
+#hwnav .hw-trigger, #hwnav .hw-list > li > a { transition: color .25s, text-shadow .25s; }
+#hwnav .hw-trigger:hover, #hwnav .hw-list > li > a:hover,
+#hwnav .hw-trigger[aria-expanded="true"] {
+  color: var(--rx-mist) !important;
+  text-shadow: 0 0 16px rgba(57, 255, 20, .55);
+}
+#hwnav .hw-panel {
+  box-shadow: 0 0 0 1px rgba(224, 21, 143, .3), 0 40px 80px -30px rgba(0, 0, 0, .9), 0 0 90px -40px rgba(224, 21, 143, .7) !important;
+}
+#hwnav .hw-link, #hwnav .hw-mlink { transition: translate .35s var(--rx-ease), color .2s; }
+#hwnav .hw-link:hover, #hwnav .hw-mlink:hover { translate: 4px 0; }
+
+.hw-ann { box-shadow: inset 0 -1px 0 rgba(224, 21, 143, .35); }
+.hwf-col-list a { transition: translate .35s var(--rx-ease), color .2s, text-shadow .2s; }
+.hwf-col-list a:hover { translate: 4px 0; color: var(--rx-aqua) !important; text-shadow: 0 0 14px rgba(57, 255, 20, .5); }
+.hwf-soc { transition: box-shadow .35s var(--rx-ease), color .2s; }
+.hwf-soc:hover { box-shadow: 0 0 0 1px rgba(57, 255, 20, .6), 0 0 22px -4px rgba(57, 255, 20, .7); color: var(--rx-aqua) !important; }
+
+/* trust strip: logos always render light on the dark skin */
+html body .hwts.hwts.hwts[data-theme="light"] {
+  --hwts-logo-filter: brightness(0) invert(1) !important;
+  --hwts-line: rgba(253, 247, 255, .12) !important;
+}
+
+
+/* ---------- cinematic reveals ---------------------------------------------------- */
+/* elements wait hidden, then a mask wipes them open */
+.rx-wait { opacity: 0 !important; }
+.rx-in { animation-duration: 1.05s; animation-timing-function: var(--rx-ease); animation-fill-mode: both; animation-delay: var(--rx-d, 0ms); }
+.rx-in.rx-fx-wipe { animation-name: rx-wipe; }                            /* headings: left-to-right curtain */
+.rx-in.rx-fx-lift { animation-name: rx-lift; animation-duration: .95s; }  /* cards: rise out of a bottom slit */
+.rx-in.rx-fx-iris { animation-name: rx-iris; animation-duration: 1.2s; }  /* photos: open from centre, settle from zoom */
+
+@keyframes rx-wipe {
+  from { opacity: 0; clip-path: inset(-10% 100% -10% 0); translate: -18px 0; }
+  35%  { opacity: 1; }
+  to   { opacity: 1; clip-path: inset(-10% -2% -10% 0); translate: 0 0; }
+}
+@keyframes rx-lift {
+  from { opacity: 0; clip-path: inset(100% 0 0 0 round 14px); translate: 0 46px; }
+  to   { opacity: 1; clip-path: inset(-20% -20% -20% -20%); translate: 0 0; }
+}
+@keyframes rx-iris {
+  from { opacity: 0; clip-path: inset(18% 18% 18% 18% round 18px); scale: 1.08; filter: brightness(1.6) saturate(.4); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0 round 0); scale: 1; filter: none; }
+}
+
+/* hero headline: the curtain passes once on load */
+.rx-hero-sweep { animation: rx-sweep 1.6s var(--rx-ease) both; }
+@keyframes rx-sweep {
+  from { clip-path: inset(-10% 100% -10% 0); opacity: 0; }
+  to   { clip-path: inset(-10% -2% -10% 0); opacity: 1; }
+}
+
+/* ---------- arcade mesh (injected, aria-hidden, non-interactive) ------------------ */
+.rx-sky {
+  position: absolute; top: 0; left: 0; width: 100%; height: 0;
+  pointer-events: none; z-index: 4; overflow: visible;
+  mix-blend-mode: screen;
+}
+.rx-sky.rx-sky-fixed { position: fixed; height: 100vh; overflow: hidden; }
+.rx-sky-band { position: absolute; left: 0; width: 100%; overflow: hidden; pointer-events: none; }
+.rx-blob {
+  position: absolute; display: block; pointer-events: none;
+  width: var(--w, 60vw); height: var(--w, 60vw); border-radius: 50%;
+  background: radial-gradient(closest-side, var(--c, rgba(224, 21, 143, .32)), transparent 72%);
+  opacity: var(--o, .9);
+  will-change: transform;
+  animation: rx-drift var(--t, 22s) ease-in-out infinite alternate;
+  animation-delay: var(--dl, 0s);
+}
+.rx-off .rx-blob { animation-play-state: paused; }
+@keyframes rx-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(var(--dx, 8vw), var(--dy, -4vw), 0) scale(1.18); }
+  100% { transform: translate3d(calc(var(--dx, 8vw) * -.6), calc(var(--dy, -4vw) * -1), 0) scale(.92); }
+}
+
+/* scroll progress: a thin arcade line */
+.rx-progress {
+  position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 2147483000;
+  background: linear-gradient(90deg, var(--rx-violet), var(--rx-aqua), var(--rx-violet-hi));
+  transform-origin: 0 50%; transform: scaleX(var(--rx-progress, 0));
+  box-shadow: 0 0 12px rgba(57, 255, 20, .8), 0 0 2px rgba(255, 255, 255, .6); pointer-events: none;
+}
+
+/* ---------- small screens ------------------------------------------------------- */
+@media (max-width: 767px) {
+  .rx-blob { --w: 120vw !important; }
+  @keyframes rx-lift { from { opacity: 0; clip-path: inset(100% 0 0 0 round 12px); translate: 0 28px; } to { opacity: 1; clip-path: inset(-20% -20% -20% -20%); translate: 0 0; } }
+}
+
+/* ---------- motion preferences / print ------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .rx-in, .rx-blob, .rx-grad.rx-live, .rx-hero-sweep { animation: none !important; }
+  .rx-wait { opacity: 1 !important; }
+  .rx-card, .rx-btn, .rx-img, .rx-pill { transition: none !important; }
+}
+@media print {
+  .rx-sky, .rx-progress { display: none !important; }
+  .rx-wait { opacity: 1 !important; }
+  .rx-grad { color: #160a29 !important; -webkit-text-fill-color: #160a29; background: none !important; }
+}
+
+/* =====================================================================================
+ * Retro Arcade effects. These override the shared dark base above; everything is paint only
+ * (opacity, clip-path, filters, shadows, fixed pseudo-element layers), so no box changes size or place.
+ *   type        arcade-title extrude: stacked magenta / cyan shadows behind display headings
+ *   motion      8-bit stepped reveals: headings pixel-wipe in, cards hop up, photos pixel-dissolve
+ *   hover       hard pixel shadows: buttons pop up and press down, cards jump
+ *   cursor      square pixel sparks in the arcade colours
+ *   atmosphere  a moving synthwave grid floor and twinkling stars
+ * ===================================================================================== */
+:root { --rx-green: #39ff14; --rx-pink: #ff2bd6; --rx-yellow: #ffe600; --rx-cyan: #00e5ff; }
+::selection { background: #ff2bd6; color: #fff; }
+.rx-sky { display: none !important; }
+.rx-card.rx-glare.rx-tilting { background-image: none !important; }
+
+/* type: arcade extrude on display headings */
+h1, h2 { text-shadow: .035em .035em 0 rgba(255, 43, 214, .85), .07em .07em 0 rgba(0, 229, 255, .55); }
+
+/* motion: 8-bit stepped reveals */
+.rx-in { animation-timing-function: steps(6, end) !important; }
+.rx-in.rx-fx-wipe { animation-duration: .7s; }
+.rx-in.rx-fx-lift { animation-duration: .5s; animation-timing-function: steps(4, end) !important; }
+.rx-in.rx-fx-iris { animation-duration: .8s; animation-timing-function: steps(5, end) !important; }
+@keyframes rx-wipe {
+  from { opacity: 1; clip-path: inset(-10% 100% -10% 0); }
+  to   { opacity: 1; clip-path: inset(-10% -2% -10% 0); }
+}
+@keyframes rx-lift {
+  from { opacity: 0; translate: 0 24px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes rx-iris {
+  from { opacity: 0; filter: blur(14px) contrast(2) saturate(2); scale: 1.08; }
+  to   { opacity: 1; filter: none; scale: 1; }
+}
+.rx-hero-sweep { animation: rx-sweep .9s steps(8, end) both; }
+@keyframes rx-sweep {
+  from { clip-path: inset(-10% 100% -10% 0); opacity: 1; }
+  to   { clip-path: inset(-10% -2% -10% 0); opacity: 1; }
+}
+
+/* hover: arcade buttons with a hard pixel shadow; press down on click */
+.rx-btn, #hwnav .hw-btn, .elementor-button, .hs-button, input[type="submit"], button[type="submit"] {
+  transition: translate .12s steps(2, end), box-shadow .12s steps(2, end), filter .2s !important;
+}
+.rx-btn:hover, #hwnav .hw-btn:hover, .elementor-button:hover, .hs-button:hover, input[type="submit"]:hover, button[type="submit"]:hover {
+  translate: -3px -3px;
+  box-shadow: 4px 4px 0 0 #ff2bd6, 7px 7px 0 0 #00e5ff !important;
+  filter: saturate(1.2);
+}
+.rx-btn:active, #hwnav .hw-btn:active, .elementor-button:active, .hs-button:active, input[type="submit"]:active, button[type="submit"]:active {
+  translate: 2px 2px; box-shadow: 0 0 0 0 #ff2bd6 !important;
+}
+
+/* hover: cards jump with pixel shadows */
+.rx-card { transition: translate .15s steps(3, end), box-shadow .15s steps(3, end), border-color .2s; }
+.rx-card.rx-hot:hover {
+  translate: -5px -5px;
+  box-shadow: 6px 6px 0 0 #ff2bd6, 10px 10px 0 0 rgba(0, 229, 255, .7) !important;
+}
+
+/* cursor: square pixel sparks (injected by arcade.js, aria-hidden, non-interactive) */
+.rx-pixels { position: fixed; inset: 0; pointer-events: none; z-index: 2147483001; overflow: hidden; }
+.rx-pix { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; animation: rx-pix .6s steps(4, end) forwards; }
+@keyframes rx-pix { from { opacity: 1; translate: 0 0; } to { opacity: 0; translate: 0 var(--dy, 16px); } }
+
+/* atmosphere: twinkling stars (html::before) and a moving synthwave grid floor (html::after).
+   Fixed pseudo-elements: not in the DOM, no layout. */
+html::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 2147481000;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1.5px 1.5px at 34% 72%, #ffe600, transparent),
+    radial-gradient(1.5px 1.5px at 58% 30%, #fff, transparent), radial-gradient(1.5px 1.5px at 82% 12%, #00e5ff, transparent),
+    radial-gradient(1.5px 1.5px at 72% 64%, #fff, transparent), radial-gradient(1.5px 1.5px at 22% 48%, #ff2bd6, transparent),
+    radial-gradient(1.5px 1.5px at 90% 82%, #fff, transparent), radial-gradient(1.5px 1.5px at 46% 90%, #fff, transparent);
+  opacity: .55; animation: rx-twinkle 3.2s steps(3, end) infinite alternate;
+}
+@keyframes rx-twinkle { from { opacity: .25; } to { opacity: .7; } }
+html::after {
+  content: ""; position: fixed; left: -50%; right: -50%; bottom: -10vh; height: 46vh; pointer-events: none; z-index: 2147481001;
+  background-image:
+    linear-gradient(rgba(255, 43, 214, .55) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 43, 214, .55) 2px, transparent 2px);
+  background-size: 64px 64px;
+  transform: perspective(320px) rotateX(62deg);
+  transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 55%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 55%);
+  opacity: .16; mix-blend-mode: screen;
+  animation: rx-grid 1.6s linear infinite;
+}
+@keyframes rx-grid { from { background-position: 0 0, 0 0; } to { background-position: 0 64px, 0 0; } }
+
+@media (max-width: 767px) { html::after { opacity: .1; } }
+@media (prefers-reduced-motion: reduce) {
+  html::before, html::after { animation: none !important; }
+  .rx-pixels { display: none; }
+  .rx-in { animation: none !important; }
+}
+@media print { html::before, html::after, .rx-pixels { display: none !important; } }
